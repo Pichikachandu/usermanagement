@@ -8,7 +8,7 @@ const tokenGenerator = (userId) => {
         expiresIn: process.env.JWT_EXPIRES_IN
     })
 };
-
+// Sign Up
 exports.signUp = async (req, res) => {
     try {
         const { fullName, email, password, role } = req.body;
@@ -80,3 +80,65 @@ exports.signUp = async (req, res) => {
         });
     }
 };
+
+// Sign In
+exports.signIn = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        // To validate the required fields
+        if (!email || !password) {
+            return res.status(400).json({
+                success: false,
+                message: "All fields are required"
+            });
+        }
+        //To check if user exists or not
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(401).json({
+                success: false,
+                message: "Invalid email or password"
+            });
+        }
+        // To check if the account is active or not
+        if (user.status === "inactive") {
+            return res.status(403).json({
+                success: false,
+                message: "Account is deactivated. Contact admin."
+            });
+        }
+        // To compare the password
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (!isPasswordValid) {
+            return res.status(401).json({
+                success: false,
+                message: "Invalid email or password"
+            });
+        }
+        // To update the last login
+        user.lastLogin = new Date();
+        await user.save();
+        // To generate the token
+        const token = tokenGenerator(user._id);
+        // To send the response
+        return res.status(200).json({
+            success: true,
+            message: "Login successful",
+            token,
+            user: {
+                id: user._id,
+                fullName: user.fullName,
+                email: user.email,
+                role: user.role
+            }
+        });
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            success: false,
+            message: "Internal Server Error"
+        });
+    }
+}
