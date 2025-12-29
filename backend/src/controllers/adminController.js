@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const User = require("../models/user");
 
 exports.getAllUsers = async (req, res) => {
@@ -41,6 +42,13 @@ exports.activateUser = async (req, res) => {
     try {
         const { id } = req.params;
 
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid User ID format"
+            });
+        }
+
         const user = await User.findById(id);
         if (!user) {
             return res.status(404).json({
@@ -72,6 +80,13 @@ exports.activateUser = async (req, res) => {
 exports.deactivateUser = async (req, res) => {
     try {
         const { id } = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid User ID format"
+            });
+        }
 
         const user = await User.findById(id);
         if (!user) {

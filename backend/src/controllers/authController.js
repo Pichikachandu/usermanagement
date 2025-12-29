@@ -28,10 +28,11 @@ exports.signUp = async (req, res) => {
             });
         }
         // To validate password
-        if (password.length < 8) {
+        const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
+        if (!passwordRegex.test(password)) {
             return res.status(400).json({
                 success: false,
-                message: "Password must be at least 8 characters long"
+                message: "Password must be at least 8 characters long and contain both letters and numbers"
             });
         }
 

@@ -92,10 +92,11 @@ exports.changePassword = async (req, res) => {
             });
         }
 
-        if (newPassword.length < 8) {
+        const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
+        if (!passwordRegex.test(newPassword)) {
             return res.status(400).json({
                 success: false,
-                message: "Password must be at least 8 characters long"
+                message: "New password must be at least 8 characters long and contain both letters and numbers"
             });
         }
 
