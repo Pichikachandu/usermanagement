@@ -11,7 +11,7 @@ const tokenGenerator = (userId) => {
 
 exports.signUp = async (req, res) => {
     try {
-        const { fullName, email, password } = req.body;
+        const { fullName, email, password, role } = req.body;
 
         //To validate the  required fields
         if (!fullName || !email || !password) {
@@ -51,7 +51,8 @@ exports.signUp = async (req, res) => {
         const user = await User.create({
             fullName,
             email,
-            password: hashedPassword
+            password: hashedPassword,
+            role: role || "user"
         });
 
         // Generate token
