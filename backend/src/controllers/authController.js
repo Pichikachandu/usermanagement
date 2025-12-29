@@ -78,95 +78,98 @@ exports.signUp = async (req, res) => {
             success: false,
             message: "Internal Server Error"
         });
-        // Logout
-        exports.logout = async (req, res) => {
-            try {
-                res.status(200).json({
-                    success: true,
-                    message: "Logout successful"
-                });
-            } catch (error) {
-                res.status(500).json({
-                    success: false,
-                    message: "Server error"
-                });
-            }
-        };
+    }
+};
 
-        // Sign In
-        exports.signIn = async (req, res) => {
-            try {
-                const { email, password } = req.body;
+// Logout
+exports.logout = async (req, res) => {
+    try {
+        res.status(200).json({
+            success: true,
+            message: "Logout successful"
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Server error"
+        });
+    }
+};
 
-                // To validate the required fields
-                if (!email || !password) {
-                    return res.status(400).json({
-                        success: false,
-                        message: "All fields are required"
-                    });
-                }
-                //To check if user exists or not
-                const user = await User.findOne({ email });
-                if (!user) {
-                    return res.status(401).json({
-                        success: false,
-                        message: "Invalid email or password"
-                    });
-                }
-                // To check if the account is active or not
-                if (user.status === "inactive") {
-                    return res.status(403).json({
-                        success: false,
-                        message: "Account is deactivated. Contact admin."
-                    });
-                }
-                // To compare the password
-                const isPasswordValid = await bcrypt.compare(password, user.password);
-                if (!isPasswordValid) {
-                    return res.status(401).json({
-                        success: false,
-                        message: "Invalid email or password"
-                    });
-                }
-                // To update the last login
-                user.lastLogin = new Date();
-                await user.save();
-                // To generate the token
-                const token = tokenGenerator(user._id);
-                // To send the response
-                return res.status(200).json({
-                    success: true,
-                    message: "Login successful",
-                    token,
-                    user: {
-                        id: user._id,
-                        fullName: user.fullName,
-                        email: user.email,
-                        role: user.role
-                    }
-                });
-            }
-            catch (error) {
-                console.log(error);
-                return res.status(500).json({
-                    success: false,
-                    message: "Internal Server Error"
-                });
-            }
+// Sign In
+exports.signIn = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        // To validate the required fields
+        if (!email || !password) {
+            return res.status(400).json({
+                success: false,
+                message: "All fields are required"
+            });
         }
-
-
-        // =============Current User============
-        exports.getCurrentUser = async (req, res) => {
-            try {
-                res.status(200).json({
-                    success: true,
-                    user: req.user
-                });
-            } catch (error) {
-                res.status(500).json({
-                    success: false,
-                    message: "Server error"
-                });
+        //To check if user exists or not
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(401).json({
+                success: false,
+                message: "Invalid email or password"
+            });
+        }
+        // To check if the account is active or not
+        if (user.status === "inactive") {
+            return res.status(403).json({
+                success: false,
+                message: "Account is deactivated. Contact admin."
+            });
+        }
+        // To compare the password
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (!isPasswordValid) {
+            return res.status(401).json({
+                success: false,
+                message: "Invalid email or password"
+            });
+        }
+        // To update the last login
+        user.lastLogin = new Date();
+        await user.save();
+        // To generate the token
+        const token = tokenGenerator(user._id);
+        // To send the response
+        return res.status(200).json({
+            success: true,
+            message: "Login successful",
+            token,
+            user: {
+                id: user._id,
+                fullName: user.fullName,
+                email: user.email,
+                role: user.role
             }
-        };
+        });
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            success: false,
+            message: "Internal Server Error"
+        });
+    }
+}
+
+
+// =============Current User============
+exports.getCurrentUser = async (req, res) => {
+    try {
+        res.status(200).json({
+            success: true,
+            user: req.user
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Server error"
+        });
+    }
+};
