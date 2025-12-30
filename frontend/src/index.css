@@ -115,6 +115,17 @@ body {
     background-color: var(--primary-hover);
 }
 
+.btn-secondary {
+    background-color: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+}
+
+.btn-secondary:hover {
+    background-color: var(--bg-color);
+    border-color: var(--text-muted);
+}
+
 .btn:disabled {
     opacity: 0.7;
     cursor: not-allowed;
@@ -129,6 +140,17 @@ body {
     font-size: 0.875rem;
     font-weight: 500;
     border-left: 4px solid var(--error-color);
+}
+
+.success-message {
+    background-color: #f0fdf4;
+    color: var(--success-color);
+    padding: 0.75rem;
+    border-radius: var(--radius);
+    margin-bottom: 1.25rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-left: 4px solid var(--success-color);
 }
 
 .auth-footer {
