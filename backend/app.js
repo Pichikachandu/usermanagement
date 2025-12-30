@@ -6,7 +6,13 @@ const userRoutes = require("./src/routes/userRoutes");
 
 const app = express();
 
-app.use(cors());
+// CORS Configuration
+app.use(cors({
+    origin: "*", // Allow all origins 
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"]
+}));
+
 app.use(express.json());
 
 app.use("/api/auth", authRoutes);
