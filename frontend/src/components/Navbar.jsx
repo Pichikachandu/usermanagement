@@ -1,27 +1,39 @@
-import { Link } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useContext } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
 
-export default function Navbar() {
-    const { user, logout } = useAuth();
+const Navbar = () => {
+    const { user, logout } = useContext(AuthContext);
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+        logout();
+        navigate("/login");
+    };
+
+    // If not logged in, don't show navbar
+    if (!user) return null;
 
     return (
         <nav className="navbar">
             <div className="nav-brand">Purple Merit</div>
+
             <div className="nav-links">
-                {user ? (
-                    <>
-                        <span>Welcome, {user.fullName} ({user.role})</span>
-                        <Link to="/dashboard">Dashboard</Link>
-                        <Link to="/profile">Profile</Link>
-                        <button onClick={logout}>Logout</button>
-                    </>
-                ) : (
-                    <>
-                        <Link to="/login">Login</Link>
-                        <Link to="/signup">Signup</Link>
-                    </>
+                {user.role === "admin" && (
+                    <Link to="/admin">Admin Dashboard</Link>
                 )}
+                <Link to="/profile">Profile</Link>
+
+                <div className="nav-user">
+                    <div className="user-info">
+                        <span className="user-name">{user.fullName}</span>
+                        <span className="user-role">{user.role}</span>
+                    </div>
+                    <button className="logout-btn" onClick={handleLogout}>Logout</button>
+                </div>
             </div>
         </nav>
     );
-}
+};
+
+export default Navbar;

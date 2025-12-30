@@ -52,46 +52,48 @@ const Login = () => {
     };
 
     return (
-        <div style={{ maxWidth: "400px", margin: "60px auto" }}>
-            <h2>Login</h2>
+        <div className="auth-page">
+            <div className="auth-card">
+                <h2>Login</h2>
 
-            {error && <p style={{ color: "red" }}>{error}</p>}
+                {error && <div className="error-message">{error}</div>}
 
-            <form onSubmit={handleSubmit}>
-                <div>
-                    <label>Email</label>
-                    <input
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="Enter email"
-                        required
-                    />
+                <form onSubmit={handleSubmit}>
+                    <div className="form-group">
+                        <label>Email</label>
+                        <input
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="name@example.com"
+                            required
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label>Password</label>
+                        <input
+                            type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            placeholder="••••••••"
+                            required
+                        />
+                    </div>
+
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className="btn btn-primary"
+                    >
+                        {loading ? "Logging in..." : "Login"}
+                    </button>
+                </form>
+
+                <div className="auth-footer">
+                    Don&apos;t have an account? <Link to="/signup">Signup</Link>
                 </div>
-
-                <div style={{ marginTop: "10px" }}>
-                    <label>Password</label>
-                    <input
-                        type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        placeholder="Enter password"
-                        required
-                    />
-                </div>
-
-                <button
-                    type="submit"
-                    disabled={loading}
-                    style={{ marginTop: "15px" }}
-                >
-                    {loading ? "Logging in..." : "Login"}
-                </button>
-            </form>
-
-            <p style={{ marginTop: "15px" }}>
-                Don&apos;t have an account? <Link to="/signup">Signup</Link>
-            </p>
+            </div>
         </div>
     );
 };
