@@ -92,7 +92,7 @@ const Profile = () => {
     return (
         <div className="auth-page">
             <div className="auth-card" style={{ maxWidth: '500px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
                     <h2 style={{ margin: 0 }}>User Profile</h2>
                     <span className="badge badge-active">{user?.role}</span>
                 </div>

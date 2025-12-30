@@ -71,7 +71,7 @@ const AdminDashboard = () => {
 
     return (
         <div className="container">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+            <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
                 <h2 style={{ margin: 0 }}>Admin Dashboard</h2>
                 <div style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>
                     Managing {users.length} users on this page
