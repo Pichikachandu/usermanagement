@@ -1,6 +1,7 @@
 import { useContext, useState } from "react";
 import api from "../services/api";
 import { AuthContext } from "../context/AuthContext";
+import { toast } from "react-toastify";
 
 const Profile = () => {
     const { user, setUser } = useContext(AuthContext);
@@ -11,18 +12,14 @@ const Profile = () => {
     const [currentPassword, setCurrentPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");
 
-    const [message, setMessage] = useState("");
-    const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
 
     // Update profile (name + email)
     const handleProfileUpdate = async (e) => {
         e.preventDefault();
-        setMessage("");
-        setError("");
 
         if (!fullName || !email) {
-            setError("Full name and email are required");
+            toast.error("Full name and email are required");
             return;
         }
 
@@ -34,9 +31,9 @@ const Profile = () => {
             });
 
             setUser(res.data.user);
-            setMessage("Profile updated successfully");
+            toast.success("Profile updated successfully");
         } catch (err) {
-            setError(
+            toast.error(
                 err.response?.data?.message || "Failed to update profile"
             );
         } finally {
@@ -47,16 +44,15 @@ const Profile = () => {
     // Change password
     const handlePasswordChange = async (e) => {
         e.preventDefault();
-        setMessage("");
-        setError("");
 
         if (!currentPassword || !newPassword) {
-            setError("Both current and new passwords are required");
+            toast.error("Both current and new passwords are required");
             return;
         }
 
-        if (newPassword.length < 8) {
-            setError("New password must be at least 8 characters long");
+        const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
+        if (!passwordRegex.test(newPassword)) {
+            toast.error("New password must be at least 8 characters long and contain both letters and numbers");
             return;
         }
 
@@ -67,11 +63,11 @@ const Profile = () => {
                 newPassword,
             });
 
-            setMessage("Password changed successfully");
+            toast.success("Password changed successfully");
             setCurrentPassword("");
             setNewPassword("");
         } catch (err) {
-            setError(
+            toast.error(
                 err.response?.data?.message || "Failed to change password"
             );
         } finally {
@@ -83,29 +79,29 @@ const Profile = () => {
     const handleCancel = () => {
         setFullName(user?.fullName || "");
         setEmail(user?.email || "");
-        setMessage("");
-        setError("");
+        toast.info("Changes discarded");
     };
 
     // Reset password fields
     const handlePasswordCancel = () => {
         setCurrentPassword("");
         setNewPassword("");
-        setMessage("");
-        setError("");
+        toast.info("Password fields cleared");
     };
 
     return (
         <div className="auth-page">
             <div className="auth-card" style={{ maxWidth: '500px' }}>
-                <h2>User Profile</h2>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                    <h2 style={{ margin: 0 }}>User Profile</h2>
+                    <span className="badge badge-active">{user?.role}</span>
+                </div>
 
-                {error && <div className="error-message">{error}</div>}
-                {message && <div className="success-message">{message}</div>}
-
-                {/* Profile Update */}
-                <form onSubmit={handleProfileUpdate} style={{ marginBottom: '2rem' }}>
-                    <h4 style={{ marginBottom: '1rem', color: 'var(--text-muted)' }}>Profile Information</h4>
+                {/* Profile Information */}
+                <form onSubmit={handleProfileUpdate} style={{ marginBottom: '2.5rem' }}>
+                    <h4 style={{ marginBottom: '1.25rem', color: 'var(--text-muted)', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>
+                        Profile Information
+                    </h4>
 
                     <div className="form-group">
                         <label>Full Name</label>
@@ -113,17 +109,17 @@ const Profile = () => {
                             type="text"
                             value={fullName}
                             onChange={(e) => setFullName(e.target.value)}
-                            placeholder="Enter full name"
+                            placeholder="John Doe"
                         />
                     </div>
 
                     <div className="form-group">
-                        <label>Email</label>
+                        <label>Email Address</label>
                         <input
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            placeholder="Enter email"
+                            placeholder="name@example.com"
                         />
                     </div>
 
@@ -132,8 +128,9 @@ const Profile = () => {
                             type="submit"
                             disabled={loading}
                             className="btn btn-primary"
+                            style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}
                         >
-                            Save Changes
+                            {loading ? <div className="spinner" style={{ width: '18px', height: '18px', borderTopColor: 'white' }}></div> : "Save Changes"}
                         </button>
                         <button
                             type="button"
@@ -146,11 +143,11 @@ const Profile = () => {
                     </div>
                 </form>
 
-                <hr style={{ margin: "2rem 0", border: 'none', borderTop: '1px solid var(--border-color)' }} />
-
-                {/* Password Change */}
+                {/* Change Password */}
                 <form onSubmit={handlePasswordChange}>
-                    <h4 style={{ marginBottom: '1rem', color: 'var(--text-muted)' }}>Change Password</h4>
+                    <h4 style={{ marginBottom: '1.25rem', color: 'var(--text-muted)', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>
+                        Security
+                    </h4>
 
                     <div className="form-group">
                         <label>Current Password</label>
@@ -177,8 +174,9 @@ const Profile = () => {
                             type="submit"
                             disabled={loading}
                             className="btn btn-primary"
+                            style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}
                         >
-                            Change Password
+                            {loading ? <div className="spinner" style={{ width: '18px', height: '18px', borderTopColor: 'white' }}></div> : "Update Password"}
                         </button>
                         <button
                             type="button"

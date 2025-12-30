@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import API from "../services/api";
+import api from "../services/api";
+import { toast } from "react-toastify";
 
 const Signup = () => {
     const [fullName, setFullName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
-    const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
 
     const navigate = useNavigate();
@@ -18,45 +18,46 @@ const Signup = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError("");
 
         // 1️⃣ Required field validation
         if (!fullName || !email || !password || !confirmPassword) {
-            setError("All fields are required");
+            toast.error("All fields are required");
             return;
         }
 
         // 2️⃣ Email format validation
         if (!isValidEmail(email)) {
-            setError("Please enter a valid email address");
+            toast.error("Please enter a valid email address");
             return;
         }
 
         // 3️⃣ Password strength validation
-        if (password.length < 8) {
-            setError("Password must be at least 8 characters long");
+        const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
+        if (!passwordRegex.test(password)) {
+            toast.error("Password must be at least 8 characters long and contain both letters and numbers");
             return;
         }
 
         // 4️⃣ Password match validation
         if (password !== confirmPassword) {
-            setError("Passwords do not match");
+            toast.error("Passwords do not match");
             return;
         }
 
         try {
             setLoading(true);
 
-            await API.post("/auth/signup", {
+            await api.post("/auth/signup", {
                 fullName,
                 email,
                 password,
             });
 
+            toast.success("Signup successful! Please login.");
             // Redirect to login after successful signup
             navigate("/login");
         } catch (err) {
-            setError(
+            toast.error(
                 err.response?.data?.message || "Signup failed. Please try again."
             );
         } finally {
@@ -68,8 +69,6 @@ const Signup = () => {
         <div className="auth-page">
             <div className="auth-card">
                 <h2>Signup</h2>
-
-                {error && <div className="error-message">{error}</div>}
 
                 <form onSubmit={handleSubmit}>
                     <div className="form-group">
@@ -120,8 +119,9 @@ const Signup = () => {
                         type="submit"
                         disabled={loading}
                         className="btn btn-primary"
+                        style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}
                     >
-                        {loading ? "Creating Account..." : "Signup"}
+                        {loading ? <div className="spinner" style={{ width: '18px', height: '18px', borderTopColor: 'white' }}></div> : "Signup"}
                     </button>
                 </form>
 

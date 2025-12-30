@@ -2,23 +2,22 @@ import { useState, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import api from "../services/api";
 import { AuthContext } from "../context/AuthContext";
+import { toast } from "react-toastify";
 
 const Login = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
 
-    const navigate = useNavigate();
     const { setUser } = useContext(AuthContext);
+    const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError("");
 
-        // Client-side validation
+        // Required field validation
         if (!email || !password) {
-            setError("Email and password are required");
+            toast.error("All fields are required");
             return;
         }
 
@@ -30,20 +29,24 @@ const Login = () => {
                 password,
             });
 
-            // Save token
-            localStorage.setItem("token", res.data.token);
+            const { token, user } = res.data;
 
-            // Set user in context
-            setUser(res.data.user);
+            // Save token to localStorage
+            localStorage.setItem("token", token);
+
+            // Update user in AuthContext
+            setUser(user);
+
+            toast.success("Login successful!");
 
             // Redirect based on role
-            if (res.data.user.role === "admin") {
+            if (user.role === "admin") {
                 navigate("/admin");
             } else {
                 navigate("/profile");
             }
         } catch (err) {
-            setError(
+            toast.error(
                 err.response?.data?.message || "Login failed. Please try again."
             );
         } finally {
@@ -55,8 +58,6 @@ const Login = () => {
         <div className="auth-page">
             <div className="auth-card">
                 <h2>Login</h2>
-
-                {error && <div className="error-message">{error}</div>}
 
                 <form onSubmit={handleSubmit}>
                     <div className="form-group">
@@ -85,8 +86,9 @@ const Login = () => {
                         type="submit"
                         disabled={loading}
                         className="btn btn-primary"
+                        style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}
                     >
-                        {loading ? "Logging in..." : "Login"}
+                        {loading ? <div className="spinner" style={{ width: '18px', height: '18px', borderTopColor: 'white' }}></div> : "Login"}
                     </button>
                 </form>
 
