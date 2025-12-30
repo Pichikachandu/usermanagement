@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: usermanagement-backend
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    rootDirectory: backend
+    envVars:
+      - key: NODE_VERSION
+        value: 18.16.0
+      - key: MONGO_URI
+        sync: false # Set this in Render Dashboard
+      - key: JWT_SECRET
+        sync: false # Set this in Render Dashboard
+      - key: JWT_EXPIRES_IN
+        value: 7d

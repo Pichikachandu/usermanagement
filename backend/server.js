@@ -7,7 +7,11 @@ connectDB();
 
 const PORT = process.env.PORT || 8000;
 app.get("/", (req, res) => {
-    res.send("Hello World");
+    res.json({
+        message: "Mini User Management System API is running",
+        status: "Online",
+        version: "1.0.0"
+    });
 });
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
