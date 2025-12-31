@@ -14,12 +14,21 @@ const Profile = () => {
 
     const [loading, setLoading] = useState(false);
 
+    const isValidEmail = (email) => {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    };
+
     // Update profile (name + email)
     const handleProfileUpdate = async (e) => {
         e.preventDefault();
 
         if (!fullName || !email) {
             toast.error("Full name and email are required");
+            return;
+        }
+
+        if (!isValidEmail(email)) {
+            toast.error("Please enter a valid email address");
             return;
         }
 
