@@ -8,28 +8,37 @@ const AdminDashboard = () => {
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [loading, setLoading] = useState(false);
+    const [searchTerm, setSearchTerm] = useState("");
 
     // Modal state
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalConfig, setModalConfig] = useState({ title: "", message: "", onConfirm: null });
 
-    const fetchUsers = async (pageNumber = 1) => {
+    const fetchUsers = async (pageNumber = page) => {
+        setLoading(true);
         try {
-            setLoading(true);
-            const res = await api.get(`/admin/users?page=${pageNumber}&limit=10`);
+            const res = await api.get(`/admin/users?page=${pageNumber}&limit=10&search=${searchTerm}`);
             setUsers(res.data.users);
             setTotalPages(res.data.totalPages);
             setPage(pageNumber);
         } catch (err) {
-            toast.error("Failed to fetch users");
+            toast.error(err.response?.data?.message || "Failed to fetch users");
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
-        fetchUsers(1);
-    }, []);
+        const delayDebounceFn = setTimeout(() => {
+            fetchUsers(1);
+        }, 500);
+
+        return () => clearTimeout(delayDebounceFn);
+    }, [searchTerm]);
+
+    useEffect(() => {
+        fetchUsers(page);
+    }, [page]);
 
     const handleActivate = (id) => {
         setModalConfig({
@@ -73,8 +82,19 @@ const AdminDashboard = () => {
         <div className="container">
             <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
                 <h2 style={{ margin: 0 }}>Admin Dashboard</h2>
-                <div style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>
-                    Managing {users.length} users on this page
+                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                    <div className="form-group" style={{ margin: 0 }}>
+                        <input
+                            type="text"
+                            placeholder="Search by name or email..."
+                            value={searchTerm}
+                            onChange={(e) => {
+                                setSearchTerm(e.target.value);
+                                setPage(1); // Reset to first page on search
+                            }}
+                            style={{ padding: '0.5rem 1rem', width: '250px' }}
+                        />
+                    </div>
                 </div>
             </div>
 

@@ -6,13 +6,23 @@ exports.getAllUsers = async (req, res) => {
         // Read pagination query
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
+        const search = req.query.search || "";
         const skip = (page - 1) * limit;
 
+        // Build filter object
+        const filter = {};
+        if (search) {
+            filter.$or = [
+                { fullName: { $regex: search, $options: "i" } },
+                { email: { $regex: search, $options: "i" } }
+            ];
+        }
+
         // Get total users count
-        const totalUsers = await User.countDocuments();
+        const totalUsers = await User.countDocuments(filter);
 
         // Fetch users (exclude password)
-        const users = await User.find()
+        const users = await User.find(filter)
             .select("-password")
             .skip(skip)
             .limit(limit)
